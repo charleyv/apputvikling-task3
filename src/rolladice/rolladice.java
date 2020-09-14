@@ -3,8 +3,7 @@ package rolladice;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RollADice {
     public static void main(String[] args) {
@@ -37,6 +36,11 @@ public class RollADice {
         p2_score_text.setBorder(border);
         p2_score_text.setBounds(SCREEN_WIDTH / 4 * 3 - 25, 500, 50, 20);
 
+        AtomicReference<String> result = new AtomicReference<>("");
+        JLabel resultText = new JLabel();
+        resultText.setBorder(border);
+        resultText.setBounds(SCREEN_WIDTH / 2, 600, 50, 20);
+
 
 
         f.add(p1);
@@ -45,6 +49,7 @@ public class RollADice {
         f.add(diceValue);
         f.add(p1_score_text);
         f.add(p2_score_text);
+        f.add(resultText);
 
         f.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);  // Frame size
         f.setLayout(null);                      // Use no layout managers
@@ -79,6 +84,16 @@ public class RollADice {
                 p2.setEnabled(true);
             }
 
+            if (p1_turns[0] == 3 && p2_turns[0] == 3) {
+                if (p1_score[0] > p2_score[0]) {
+                    result.set("p1 wins");
+                } else if (p1_score[0] == p2_score[0]) {
+                    result.set("tie");
+                } else {
+                    result.set("p2 wins");
+                }
+                resultText.setText(result.get());
+            }
         });
 
         p2.addActionListener(e -> {
@@ -96,6 +111,19 @@ public class RollADice {
             if (p1_turns[0] < 3) {
                 p1.setEnabled(true);
             }
+
+            if (p1_turns[0] == 3 && p2_turns[0] == 3) {
+                if (p1_score[0] > p2_score[0]) {
+                    result.set("p1 wins");
+                } else if (p1_score[0] == p2_score[0]) {
+                    result.set("tie");
+                } else {
+                    result.set("p2 wins");
+                }
+                resultText.setText(result.get());
+            }
         });
+
+
     }
 }
