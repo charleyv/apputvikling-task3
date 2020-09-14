@@ -17,6 +17,10 @@ public class RollADice {
 
         JButton p1=new JButton("Player 1");
         JButton p2=new JButton("Player 2");
+
+        p1.setEnabled(true);
+        p2.setEnabled(false);
+
         p1.setBounds(130,150,150, 40);
         p2.setBounds(320,150,150, 40);
 
@@ -25,11 +29,22 @@ public class RollADice {
         diceValue.setBorder(border);
         diceValue.setBounds(SCREEN_WIDTH / 2 - 5, 250, 10, 20);
 
+        JLabel p1_score_text = new JLabel();
+        p1_score_text.setBorder(border);
+        p1_score_text.setBounds(SCREEN_WIDTH / 4 - 25, 500, 50, 20);
+
+        JLabel p2_score_text = new JLabel();
+        p2_score_text.setBorder(border);
+        p2_score_text.setBounds(SCREEN_WIDTH / 4 * 3 - 25, 500, 50, 20);
+
+
 
         f.add(p1);
         f.add(p2);
         f.add(desc);
         f.add(diceValue);
+        f.add(p1_score_text);
+        f.add(p2_score_text);
 
         f.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);  // Frame size
         f.setLayout(null);                      // Use no layout managers
@@ -40,23 +55,46 @@ public class RollADice {
 
 
         /** Score tracking **/
-        final int[] score_p1 = {0};
-        int score_p2 = 0;
+        final int[] p1_score = {0};
+        final int[] p2_score = {0};
+
+        /** Turn count **/
+        final int[] p1_turns = {0};
+        final int[] p2_turns = {0};
 
         /** Button logic **/
-        p1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Dice d = new Dice();
-                int r = d.Roll();
-                score_p1[0] += r;
+        p1.addActionListener(e -> {
+            Dice d = new Dice();
+            int r = d.Roll();
+            p1_score[0] += r;
+            p1_turns[0]++;
 
-                String rs = String.valueOf(r);
-                diceValue.setText(rs);
+            String rs = String.valueOf(r);
+            diceValue.setText(rs);
 
+            p1_score_text.setText(String.valueOf(p1_score[0]));
 
+            p1.setEnabled(false);
+            if (p2_turns[0] < 3) {
+                p2.setEnabled(true);
+            }
 
+        });
 
+        p2.addActionListener(e -> {
+            Dice d = new Dice();
+            int r = d.Roll();
+            p2_score[0] += r;
+            p2_turns[0]++;
 
+            String rs = String.valueOf(r);
+            diceValue.setText(rs);
+
+            p2_score_text.setText(String.valueOf(p2_score[0]));
+
+            p2.setEnabled(false);
+            if (p1_turns[0] < 3) {
+                p1.setEnabled(true);
             }
         });
     }
