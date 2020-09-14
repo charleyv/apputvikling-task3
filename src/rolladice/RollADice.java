@@ -37,9 +37,10 @@ public class RollADice {
         p2_score_text.setBounds(SCREEN_WIDTH / 4 * 3 - 25, 500, 50, 20);
 
         AtomicReference<String> result = new AtomicReference<>("");
-        JLabel resultText = new JLabel();
+        JLabel resultText = new JLabel("", SwingConstants.CENTER);
         resultText.setBorder(border);
-        resultText.setBounds(SCREEN_WIDTH / 2, 600, 50, 20);
+        int resultTextWidth = 100;
+        resultText.setBounds(SCREEN_WIDTH / 2 - resultTextWidth / 2, 600, 100, 20);
 
 
 
