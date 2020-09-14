@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RollADice {
-    public static void main(String[] args) {
+    public static void runGame() {
         JFrame f=new JFrame("Roll A Dice");//creating instance of JFrame
         int SCREEN_HEIGHT = 800;
         int SCREEN_WIDTH = 600;
@@ -56,7 +56,6 @@ public class RollADice {
         f.setVisible(true);                     // Frame visible
 
 
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
         /** Score tracking **/
