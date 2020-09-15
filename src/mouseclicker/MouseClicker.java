@@ -2,8 +2,8 @@ package mouseclicker;
 
 import javax.swing.*;
 
-public class mouseclicker {
-    public static void main(String[] args) {
+public class MouseClicker {
+    public static void runGame() {
         JFrame f=new JFrame("Maximum Clicks");//creating instance of JFrame
         int SCREEN_HEIGHT = 800;
         int SCREEN_WIDTH = 600;
