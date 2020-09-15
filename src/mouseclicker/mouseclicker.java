@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.LocalTime;
 import java.util.Scanner;
 
 public class mouseclicker {
@@ -67,7 +68,7 @@ public class mouseclicker {
     }
 
     private static void startClick(JLabel timer, JLabel count, JButton clicker) {
-
+        LocalTime startTime = LocalTime.now();
         clicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,6 +97,5 @@ public class mouseclicker {
         }
         return line;
     }
-
 
 }
