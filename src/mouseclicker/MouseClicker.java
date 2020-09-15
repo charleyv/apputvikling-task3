@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MouseClicker {
 
+
     private static final long timeLimit = 5L;
     private static JButton clickBtn = new JButton("CLICK");
     private static  JButton startBtn = new JButton("START");
@@ -65,6 +66,8 @@ public class MouseClicker {
 
     private static int amountOfClicks = 0;
     private static boolean firstRun = true;
+    private final static String RECORD_FILE = "record.txt";
+
 
     public static void runGame() {
         JFrame f=new JFrame("Maximum Clicks");//creating instance of JFrame
@@ -152,7 +155,7 @@ public class MouseClicker {
     private static String checkHighScore() {
         String line = "";
         Scanner reader;
-        File fileObj = new File("./src/mouseclicker/record.txt");
+        File fileObj = new File(RECORD_FILE);
         // Attempt to open the record file
         try {
             reader = new Scanner(fileObj);
