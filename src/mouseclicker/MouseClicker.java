@@ -1,15 +1,71 @@
 package mouseclicker;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.time.LocalTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 public class MouseClicker {
+
+    private static final long timeLimit = 5L;
+    private static JButton clickBtn = new JButton("CLICK");
+    private static  JButton startBtn = new JButton("START");
+
+    private static class MyThread implements Runnable {
+
+        private static AtomicReference<Long> seconds = new AtomicReference<Long>(0L);
+        private static AtomicReference<Boolean> active = new AtomicReference<Boolean>(true);
+        private static JLabel timer;
+
+        public MyThread(JLabel clockTimer){
+            timer = clockTimer;
+        }
+
+
+        @Override
+        public void run() {
+            active.set(true);
+            Duration deltaTime = Duration.ZERO;
+            Instant beginTime = Instant.now();
+
+            while(active.get()) {
+                deltaTime = Duration.between(beginTime, Instant.now());
+                seconds.set(deltaTime.getSeconds());
+                timer.setText(String.format("Time Left: %d Seconds", (timeLimit - seconds.get())));
+                if(seconds.get() >= timeLimit) {
+                    off();
+                    endGame();
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        public static void off() {
+            amountOfClicks = 0;
+            active.set(false);
+        }
+
+        public static long getSeconds() {
+            return seconds.get();
+        }
+
+    }
+
+
+    private static int amountOfClicks = 0;
+    private static boolean firstRun = true;
+
     public static void runGame() {
         JFrame f=new JFrame("Maximum Clicks");//creating instance of JFrame
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,11 +84,11 @@ public class MouseClicker {
         JLabel infoTxt = new JLabel("See how many clicks you can do in a minute!");
         infoTxt.setBounds(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/3 - 25, 300, 50);
 
-        JButton startBtn = new JButton("START");
+
         startBtn.setBounds(SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT/3 + 25, 300, 50);
         startBtn.setFont(new Font("Verdana", Font.BOLD, 20));
 
-        JButton clickBtn = new JButton("CLICK");//creating instance of JButton
+
         clickBtn.setFont(new Font("Verdana", Font.BOLD, 16));
         clickBtn.setBounds(SCREEN_WIDTH/2 - 200,SCREEN_HEIGHT/2 - 20,100, 40);//x axis, y axis, width, height
         clickBtn.setEnabled(false);
@@ -48,8 +104,13 @@ public class MouseClicker {
         startBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                startClick(startBtn, timeCounter, counter, clickBtn);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
                 clickBtn.setEnabled(true);
-                startClick(timeCounter, counter, clickBtn);
                 startBtn.setEnabled(false);
             }
         });
@@ -67,17 +128,24 @@ public class MouseClicker {
         f.setVisible(true);//making the frame visible
     }
 
-    private static void startClick(JLabel timer, JLabel count, JButton clicker) {
-        LocalTime startTime = LocalTime.now();
-        clicker.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String[] counterText = count.getText().split("\\s");  // Get the current number of clicks
-                int amountOfClicks = Integer.parseInt(counterText[1]);  // Convert to int
-                ++amountOfClicks;  // Increment
-                count.setText("COUNTER: " + Integer.toString(amountOfClicks));  // Convert back to string
-            }
-        });
+    private static void startClick(JButton startBtn ,JLabel timer, JLabel count, JButton clicker) {
+
+        MyThread timerThread = new MyThread(timer);
+        Thread thread = new Thread(timerThread);
+        count.setText("COUNTER: 0");
+
+        if(firstRun) {
+            clicker.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    ++amountOfClicks;  // Increment
+                    count.setText("COUNTER: " + Integer.toString(amountOfClicks));  // Convert back to string
+                }
+            });
+            firstRun = false;
+        }
+        thread.start();
 
     }
 
@@ -96,6 +164,33 @@ public class MouseClicker {
             System.out.println("Couldn't open file");
         }
         return line;
+    }
+
+//    private static String checkNewHighScore(String postGameScore) {
+//        int currentScoreInt = Integer.parseInt(checkHighScore());
+//        int postGameScoreInt = Integer.parseInt(postGameScore);
+//        if (postGameScoreInt >= currentScoreInt) {
+//            Scanner reader;
+//            File fileObj = new File("./src/mouseclicker/record.txt");
+//            // Attempt to open the record file
+//            try {
+//                String line = "";
+//                reader = new Scanner(fileObj);
+//                if(reader.hasNext()) {
+//                    line = reader.nextLine(); // If there is a high-score there, fetch it
+//
+//                }
+//                reader.close();
+//            } catch (IllegalAccessError | FileNotFoundException e) {
+//                System.out.println("Couldn't open file");
+//            }
+//        }
+//    }
+
+    private static void endGame() {
+        clickBtn.setEnabled(false);     // Disable click button
+        startBtn.setEnabled(true);
+        MyThread.off();
     }
 
 }
