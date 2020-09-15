@@ -9,8 +9,8 @@ import java.io.FileNotFoundException;
 import java.time.LocalTime;
 import java.util.Scanner;
 
-public class mouseclicker {
-    public static void main(String[] args) {
+public class MouseClicker {
+    public static void runGame() {
         JFrame f=new JFrame("Maximum Clicks");//creating instance of JFrame
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int SCREEN_HEIGHT = 800;
