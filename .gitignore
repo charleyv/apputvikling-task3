@@ -4,5 +4,6 @@
 # Log file
 *.log
 
+record.txt
 
 out/

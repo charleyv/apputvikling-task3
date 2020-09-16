@@ -44,7 +44,6 @@ public class MouseClicker {
                 seconds.set(deltaTime.getSeconds());
                 timer.setText(String.format("Time Left: %d Seconds", (timeLimit - seconds.get())));
                 if(seconds.get() >= timeLimit) {
-                    off();
                     try {
                         endGame();
                     } catch (IOException e) {
@@ -74,12 +73,12 @@ public class MouseClicker {
 
     private static int amountOfClicks = 0;
     private static boolean firstRun = true;
-    private final static String RECORD_FILE = "record.txt";
+    private final static String RECORD_FILE = "./record.txt";
 
 
     public static void runGame() {
         JFrame f=new JFrame("Maximum Clicks");//creating instance of JFrame
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int SCREEN_HEIGHT = 800;
         int SCREEN_WIDTH = 600;
 
@@ -172,13 +171,14 @@ public class MouseClicker {
             }
             reader.close();
         } catch (IllegalAccessError | FileNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Failed to open file.");
         }
         return line;
     }
 
     private static void checkNewHighScore() throws IOException {
         int currentScoreInt = Integer.parseInt(checkHighScore());
+
         if (amountOfClicks > currentScoreInt) {    // If the amount of clicks is higher than the high-score
             try {
                 FileWriter filewriter = new FileWriter(RECORD_FILE);
