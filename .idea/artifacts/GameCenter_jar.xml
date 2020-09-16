@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="GameCenter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/GameCenter_jar</output-path>
+    <root id="archive" name="GameCenter.jar">
+      <element id="module-output" name="GameCenter" />
+    </root>
+  </artifact>
+</component>
