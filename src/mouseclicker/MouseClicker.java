@@ -1,10 +1,13 @@
 package mouseclicker;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Scanner;
@@ -15,8 +18,9 @@ public class MouseClicker {
 
 
     private static final long timeLimit = 5L;
-    private static JButton clickBtn = new JButton("CLICK");
-    private static  JButton startBtn = new JButton("START");
+    private static final JButton clickBtn = new JButton("CLICK");
+    private static final JButton startBtn = new JButton("START");
+    private static JLabel highScore = new JLabel("High-score: ");
 
     private static class MyThread implements Runnable {
 
@@ -41,7 +45,11 @@ public class MouseClicker {
                 timer.setText(String.format("Time Left: %d Seconds", (timeLimit - seconds.get())));
                 if(seconds.get() >= timeLimit) {
                     off();
-                    endGame();
+                    try {
+                        endGame();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 try {
                     Thread.sleep(1000);
@@ -80,7 +88,7 @@ public class MouseClicker {
             currentHighScore = "0 Clicks";
         }
 
-        JLabel highScore = new JLabel("High-score: " + currentHighScore);
+        highScore.setText("High-score: " + currentHighScore);
         highScore.setBounds(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/4 -25, 300, 50);
         highScore.setFont(new Font("Verdana", Font.BOLD, 20));
 
@@ -107,7 +115,7 @@ public class MouseClicker {
         startBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startClick(startBtn, timeCounter, counter, clickBtn);
+                startClick(timeCounter, counter);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException interruptedException) {
@@ -131,14 +139,14 @@ public class MouseClicker {
         f.setVisible(true);//making the frame visible
     }
 
-    private static void startClick(JButton startBtn ,JLabel timer, JLabel count, JButton clicker) {
+    private static void startClick(JLabel timer, JLabel count) {
 
         MyThread timerThread = new MyThread(timer);
         Thread thread = new Thread(timerThread);
         count.setText("COUNTER: 0");
 
         if(firstRun) {
-            clicker.addActionListener(new ActionListener() {
+            MouseClicker.clickBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
 
@@ -153,46 +161,40 @@ public class MouseClicker {
     }
 
     private static String checkHighScore() {
-        String line = "";
+        String line = "0";
         Scanner reader;
         File fileObj = new File(RECORD_FILE);
         // Attempt to open the record file
         try {
             reader = new Scanner(fileObj);
-            if(reader.hasNext()) {
+            if(reader.hasNextLine()) {
                 line = reader.nextLine(); // If there is a high-score there, fetch it
             }
             reader.close();
         } catch (IllegalAccessError | FileNotFoundException e) {
-            System.out.println("Couldn't open file");
+            e.printStackTrace();
         }
         return line;
     }
 
-//    private static String checkNewHighScore(String postGameScore) {
-//        int currentScoreInt = Integer.parseInt(checkHighScore());
-//        int postGameScoreInt = Integer.parseInt(postGameScore);
-//        if (postGameScoreInt >= currentScoreInt) {
-//            Scanner reader;
-//            File fileObj = new File("./src/mouseclicker/record.txt");
-//            // Attempt to open the record file
-//            try {
-//                String line = "";
-//                reader = new Scanner(fileObj);
-//                if(reader.hasNext()) {
-//                    line = reader.nextLine(); // If there is a high-score there, fetch it
-//
-//                }
-//                reader.close();
-//            } catch (IllegalAccessError | FileNotFoundException e) {
-//                System.out.println("Couldn't open file");
-//            }
-//        }
-//    }
+    private static void checkNewHighScore() throws IOException {
+        int currentScoreInt = Integer.parseInt(checkHighScore());
+        if (amountOfClicks > currentScoreInt) {    // If the amount of clicks is higher than the high-score
+            try {
+                FileWriter filewriter = new FileWriter(RECORD_FILE);
+                filewriter.write(String.format("%d\n", amountOfClicks));
+                filewriter.close();
+                highScore.setText("High-score: " + amountOfClicks);
+            } catch (IOException e){
+                System.out.println(e + ", failed to write to file");
+            }
+        }
+    }
 
-    private static void endGame() {
+    private static void endGame() throws IOException {
         clickBtn.setEnabled(false);     // Disable click button
         startBtn.setEnabled(true);
+        checkNewHighScore();
         MyThread.off();
     }
 
